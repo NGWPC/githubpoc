@@ -3,13 +3,14 @@ stages:
   - test
   - deploy
 
+image: docker
+
 variables:
     FOO: BAR
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/gitlab_poc
     DOCKER_IMAGE_TAG: $CI_COMMIT_REF_NAME
 
 before_script:
-  - apt-get update -qy
   - echo "Logging in to Gitlab Container Registry..."
   - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
 
@@ -17,7 +18,8 @@ build:
   stage: build
   script:
     - echo "Building test Rocky Linux container... "
-    - docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - echo docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - docker build -t "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG" .
     - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
 test:
