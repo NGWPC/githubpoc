@@ -1,4 +1,5 @@
 stages:
+  - sonarqube-check
   - build
   - test
   - deploy
