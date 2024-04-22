@@ -4,10 +4,9 @@ stages:
   - test
   - deploy
 
-image: docker
+image: registry.sh.nextgenwaterprediction.com/infrastructure/docker/docker:26.0.2
 
 variables:
-    FOO: BAR
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/gitlab_poc
     DOCKER_IMAGE_TAG: $CI_COMMIT_REF_NAME
 
