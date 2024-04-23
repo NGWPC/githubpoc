@@ -10,10 +10,6 @@ variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/gitlab_poc
     DOCKER_IMAGE_TAG: $CI_COMMIT_REF_NAME
 
-before_script:
-  - echo "Logging in to Gitlab Container Registry..."
-  - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-
 analyze:sonar:
   stage: sonarqube
   image:
@@ -41,6 +37,8 @@ analyze:sonar:
 build:
   stage: build
   script:
+    - echo "Logging in to Gitlab Container Registry..."
+    - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     - echo "Building test Rocky Linux container... "
     - echo docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
     - docker build -t "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG" .
