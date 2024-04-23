@@ -1,24 +1,43 @@
 stages:
+  - sonarqube-check
   - build
   - test
   - deploy
 
-variables:
-    FOO: BAR
-  # DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/gitlab_poc
-  # DOCKER_IMAGE_TAG: $CI_COMMIT_REF_NAME
+image: registry.sh.nextgenwaterprediction.com/infrastructure/docker/docker:26.0.2
 
-# before_script:
-  # - apt-get update -qy
-  # - echo "Logging in to Gitlab Container Registry..."
-  # - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+variables:
+    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/gitlab_poc
+    DOCKER_IMAGE_TAG: $CI_COMMIT_REF_NAME
+
+before_script:
+  - echo "Logging in to Gitlab Container Registry..."
+  - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+
+sonarqube-check:
+  image: 
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: 
+    - sonar-scanner
+  allow_failure: true
+  only:
+    - main
 
 build:
   stage: build
   script:
     - echo "Building test Rocky Linux container... "
-    # - docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
-    # - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - echo docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - docker build -t "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG" .
+    - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
 test:
   stage: test
