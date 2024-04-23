@@ -20,7 +20,14 @@ sonarqube-check:
     - pwd
     - echo ${CI_PROJECT_DIR}
     - ls -l
-    - docker run --rm -e SONAR_SCANNER_OPTS="-Dproject.settings=./sonar-project.properties" -e GIT_DEPTH=0 -e SONAR_HOST_URL=${SONAR_HOST_URL} -e SONAR_TOKEN=${SONAR_TOKEN} -e SONAR_USER_HOME="${CI_PROJECT_DIR}/.sonar" -v "${CI_PROJECT_DIR}:/usr/src" registry.sh.nextgenwaterprediction.com/infrastructure/sonar-scanner-cli/sonar-scanner-cli:5.0.1
+    - | 
+      docker run --rm 
+      -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=infrastructure_gitlabpoc_AY73s78WAAzHqW6WQ7zg" 
+      -e GIT_DEPTH=0 
+      -e SONAR_HOST_URL=${SONAR_HOST_URL} 
+      -e SONAR_TOKEN=${SONAR_TOKEN} 
+      -e SONAR_USER_HOME="${CI_PROJECT_DIR}/.sonar" 
+      -v "${CI_PROJECT_DIR}:/usr/src" registry.sh.nextgenwaterprediction.com/infrastructure/sonar-scanner-cli/sonar-scanner-cli:5.0.1
   allow_failure: true
   only:
     - main
