@@ -16,7 +16,7 @@ before_script:
 
 sonarqube-check:
   image: 
-    name: sonarsource/sonar-scanner-cli:latest
+    name: registry.sh.nextgenwaterprediction.com/infrastructure/sonar-scanner-cli/sonar-scanner-cli:5.0.1
     entrypoint: [""]
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
