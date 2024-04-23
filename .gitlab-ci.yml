@@ -20,7 +20,7 @@ sonarqube-check:
     - pwd
     - echo ${CI_PROJECT_DIR}
     - ls -l
-    - | 
+    - > 
       docker run --rm 
       -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=infrastructure_gitlabpoc_AY73s78WAAzHqW6WQ7zg" 
       -e GIT_DEPTH=0 
