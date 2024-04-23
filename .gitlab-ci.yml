@@ -1,5 +1,5 @@
 stages:
-  - sonarqube-check
+  - sonarqube
   - build
   - test
   - deploy
@@ -14,21 +14,29 @@ before_script:
   - echo "Logging in to Gitlab Container Registry..."
   - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
 
-sonarqube-check:
-  stage: sonarqube-check
+analyze:sonar:
+  stage: sonarqube
+  image:
+    name: registry.sh.nextgenwaterprediction.com/infrastructure/sonar-scanner-cli/sonar-scanner-cli:5.0.1
+    entrypoint: [""]
+  variables:
+    # Defines the location of the analysis task cache
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    # Shallow cloning needs to be disabled.
+    # See https://docs.sonarqube.org/latest/analysis/gitlab-cicd/.
+    GIT_DEPTH: 0
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
   script:
-    - pwd
-    - echo ${CI_PROJECT_DIR}
-    - ls -l
-    - > 
-      docker run --rm 
-      -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=infrastructure_gitlabpoc_AY73s78WAAzHqW6WQ7zg" 
-      -e SONAR_HOST_URL=${SONAR_HOST_URL} 
-      -e SONAR_TOKEN=${SONAR_TOKEN} 
-      -v "${CI_PROJECT_DIR}:/usr/src" registry.sh.nextgenwaterprediction.com/infrastructure/sonar-scanner-cli/sonar-scanner-cli:5.0.1
-  allow_failure: true
-  only:
-    - main
+    - sonar-scanner -X -Dsonar.verbose=true
+  rules:
+    # SonarQube CommunityEdition only supports analyzing a single branch.
+    # So only run on master.
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: never
 
 build:
   stage: build
