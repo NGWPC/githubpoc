@@ -4,7 +4,7 @@ RUN dnf install -y python pip
 
 WORKDIR /app
 
-COPY . .
+COPY . /app
 
 RUN pip install .
 

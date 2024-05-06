@@ -4,7 +4,8 @@ RUN dnf install -y python pip
 
 WORKDIR /app
 
-COPY . .
+COPY simple_server /app
+COPY setup.py /app
 
 RUN pip install --index-url ${CI_SERVER_PROTOCOL}://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple .
 
