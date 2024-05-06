@@ -4,11 +4,14 @@
 
 This is a POC for using Gitlab to create and monitor software pipelines.
 
-At the time of this writing, the pipeline is designed to: 
+At the time of this writing, the pipeline is designed to excercise a number of GitLab features in a very basic manner: 
 
-- Push to "production" and "staging" environments
-- Build and push a Rocky Linux 9 image to the Gitlab repository
-- Require manual approval in the Gitlab dashboard to "deploy"
+- Build a basic hello world web service written in python (bare bones)
+- Lint the code
+- Run unit tests
+- Install python modules from the GitLab package Registry
+- Use the GitLab container registry
+- Push the simple_server code docker image to the GitLab container registry
 
 ## Notes 
 
