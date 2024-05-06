@@ -93,7 +93,7 @@ deploy_image:
     - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
     - docker push $DOCKER_IMAGE_NAME:latest
-    - docker tag $TARGET_IMAGE:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:$TARGET_VERSION
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:$TARGET_VERSION
     - docker push $DOCKER_IMAGE_NAME:$TARGET_VERSION
     - docker logout
   only:
