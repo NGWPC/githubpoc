@@ -11,6 +11,6 @@ setup(
     },
     install_requires=[],
     extras_require={
-        'testing': ['requests==2.31.0', 'pytest==7.3.1', 'flake8==7.0.0'],
+        'testing': ['requests==2.31.0', 'pytest==7.3.1', 'flake8==7.0.0', 'coverage'],
     },
 )
