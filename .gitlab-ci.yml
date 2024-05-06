@@ -1,4 +1,9 @@
+include:
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
 stages:
+  - lint
+  - unit_test
   - sonarqube
   - build
   - test
@@ -7,8 +12,18 @@ stages:
 image: registry.sh.nextgenwaterprediction.com/infrastructure/docker/docker:26.0.2
 
 variables:
-    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/gitlab_poc
+    DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/simple_server
     DOCKER_IMAGE_TAG: $CI_COMMIT_REF_NAME
+    TARGET_VERSION: "0.0.1"
+
+lint:
+  stage: lint
+  image: registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:9.3
+  before_script:
+    - dnf install -y python pip
+    - pip install .[testing] --index-url ${CI_SERVER_PROTOCOL}://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple
+  script:
+    - flake8 . --max-line-length=120
 
 analyze:sonar:
   stage: sonarqube
@@ -34,42 +49,50 @@ analyze:sonar:
       when: on_success
     - when: never
 
+unit_test:
+  stage: unit_test
+  image: registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:9.3
+  before_script:
+    - dnf install -y python pip
+  script:
+    - pip install . --index-url ${CI_SERVER_PROTOCOL}://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple
+    - pip install .[testing] --index-url ${CI_SERVER_PROTOCOL}://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple
+    - pytest --junitxml=test-results.xml
+  artifacts:
+    reports:
+      junit: test-results.xml
+
 build:
   stage: build
   script:
     - echo "Logging in to Gitlab Container Registry..."
     - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     - echo "Building test Rocky Linux container... "
-    - echo docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - echo docker build -f Dockerfile-gitlab -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
     - docker build -t "$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG" .
     - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - docker logout
 
-test:
+container_scanning:
   stage: test
-  needs: 
-      - build
-  script:
-    - echo "Testing..."
-    # Test commands here
+  needs:
+    - build
+  variables:
+    SECURE_LOG_LEVEL: info
+    CS_SEVERITY_THRESHOLD: UNKNOWN
+    CS_IMAGE: $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
-deploy_staging:
+
+deploy_image:
   stage: deploy
   script:
-    - echo "Deploying to Staging..."
-    # Deployment commands here
-  rules:
-    - when: manual
-    - changes:
-      - '**/*'
+    - echo "Logging in to Gitlab Container Registry, to push the image."
+    - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
+    - docker push $DOCKER_IMAGE_NAME:latest
+    - docker tag $TARGET_IMAGE:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:$TARGET_VERSION
+    - docker push $DOCKER_IMAGE_NAME:$TARGET_VERSION
+    - docker logout
+  only:
+    - main
 
-
-deploy_production:
-  stage: deploy
-  script:
-    - echo "Deploying to Production..."
-    # Deployment commands here
-  rules:
-    - when: manual
-    - if: $CI_COMMIT_BRANCH == 'main'
-    - changes:
-      - '**/*'

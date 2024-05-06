@@ -1,0 +1,9 @@
+{
+    "name": "Python Development",
+    "image": "python:3.9-slim",
+    "extensions": ["ms-python.python"],
+    "postCreateCommand": "pip install .",
+    "appPort": [8000],
+    "runArgs": ["-m", "simple_server"]
+  }
+  

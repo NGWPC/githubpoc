@@ -1,7 +1,11 @@
-FROM rockylinux/rockylinux:9
+FROM registry.sh.nextgenwaterprediction.com/infrastructure/rockylinux/rockylinux:9.3
+
+RUN dnf install -y python pip
 
 WORKDIR /app
 
-RUN echo "Hello, World!" > hello.txt
+COPY . .
 
-CMD cat hello.txt
+RUN pip install .
+
+CMD ["simple_server"]
