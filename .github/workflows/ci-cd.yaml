@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_IMAGE_NAME: ${{ github.repository_owner }}/simple_server
+  DOCKER_IMAGE_NAME: "ngwpc/simple_server"
   DOCKER_IMAGE_TAG: ${{ github.ref_name }}
   TARGET_VERSION: "0.0.1"
   REGISTRY: ghcr.io
@@ -53,7 +53,7 @@ jobs:
     runs-on: self-hosted
     needs: unit_test
     container:
-      image: sonar-scanner-cli:5.0.1
+      image: sonarsource/sonar-scanner-cli
       options: --entrypoint=""
     steps:
       - uses: actions/checkout@v4
