@@ -17,6 +17,7 @@ jobs:
     runs-on: self-hosted
     container:
       image: rockylinux:9.3
+      options: --user 0
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
@@ -30,6 +31,7 @@ jobs:
     runs-on: self-hosted
     container:
       image: rockylinux:9.3
+      options: --user 0
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
@@ -54,7 +56,7 @@ jobs:
     needs: unit_test
     container:
       image: sonarsource/sonar-scanner-cli
-      options: --entrypoint=""
+      options: --entrypoint="" --user 0
     steps:
       - uses: actions/checkout@v4
         with:
