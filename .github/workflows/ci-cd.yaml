@@ -73,6 +73,7 @@ jobs:
 
   build:
     runs-on: self-hosted
+    needs: [lint, unit_test, sonarqube]
     steps:
       - name: Fix workspace permissions
         run: sudo chown -R $(whoami):$(whoami) ${{ github.workspace }}
