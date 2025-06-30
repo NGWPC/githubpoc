@@ -52,4 +52,4 @@ Uses `sonarsource/sonar-scanner-cli` to analyze code quality, referencing test a
 
 ## Previous GitLab Setup
 
-This project was originally built using GitLab CI/CD and GitLab Container Registry. It has been ported to GitHub as part of a broader transition. The original `.gitlab-ci.yml` exercised similar functionality, targeting GitLab-native tooling and registries.  It has been retained in the repo for reference.
+This project was originally built using GitLab CI/CD and GitLab Container Registry. It has been ported to GitHub as part of a broader transition. The original `.gitlab-ci.yml` exercised similar functionality, targeting GitLab-native tooling and registries.  This has been retained in the repo for reference.
